@@ -1,17 +1,31 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import moralis from "moralis";
+
+moralis.initialize(process.env.REACT_APP_MORALIS_APPLICATION_ID);
+moralis.serverURL = process.env.REACT_APP_MORALIS_SERVER_URL;
+
+const initialUser = moralis.User.current();
+
+const App = () => {
+  const [user, setUser] = useState(initialUser);
+  const onLogin = async () => {
+    const user = await moralis.authenticate();
+    setUser(user);
+  };
+  const onLogout = () => {
+    moralis.User.logOut();
+    setUser(null);
+  };
+  if (user) {
+    return <button onClick={onLogout}>Logout</button>;
+  }
+  return <button onClick={onLogin}>Login</button>;
+};
 
 ReactDOM.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
